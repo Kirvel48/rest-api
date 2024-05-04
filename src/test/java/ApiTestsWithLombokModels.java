@@ -1,13 +1,15 @@
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import models.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static helpers.CustomApiListener.withCustomTemplates;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ApiTests {
+public class ApiTestsWithLombokModels {
 
     @BeforeAll
     public static void beforeAll() {
@@ -28,18 +30,25 @@ public class ApiTests {
 
     @Test
     void registerUserSuccessTest() {
-        String userData = "{\"password\": \"pistol\", \"email\": \"eve.holt@reqres.in\"}";
+        ApiTestsRegisterModel ApiTestRegisterModel = new ApiTestsRegisterModel();
+        ApiTestRegisterModel.setEmail("eve.holt@reqres.in");
+        ApiTestRegisterModel.setPassword("pistol");
 
-        given()
+        ApiTestsRegisterResponseModel response = (ApiTestsRegisterResponseModel) given()
                 .log().all()
                 .filter(withCustomTemplates())
                 .contentType(ContentType.JSON)
-                .body(userData)
+                .body(ApiTestRegisterModel)
                 .when()
                 .post("/register")
                 .then()
-                .assertThat().statusCode(200);
+                .assertThat().statusCode(200)
+                .extract().as(ApiTestsRegisterResponseModel.class);
+        assertEquals("4", response.getId());
+        assertEquals("QpwL5tke4Pnpja7X4", response.getToken());
+
     }
+
 
     @Test
     void checkAvatar() {
@@ -55,35 +64,47 @@ public class ApiTests {
 
     @Test
     void createUserTest() {
-        String userData = "{\"name\": \"Joe\", \"job\": \"actor\"}";
-        given()
+        ApiTestsUserModel ApiTestsModel = new ApiTestsUserModel();
+        ApiTestsModel.setName("Joe");
+        ApiTestsModel.setJob("actor");
+        ApiTestsCreateResponseModel response = given()
 
                 .log().all()
-                .filter(withCustomTemplates())
                 .contentType(ContentType.JSON)
-                .body(userData)
+                .filter(withCustomTemplates())
+                .body(ApiTestsModel)
                 .when()
                 .post("/users")
                 .then()
                 .assertThat().statusCode(201)
-                .body("name", is("Joe"));
+                .extract().as(ApiTestsCreateResponseModel.class);
+        assertEquals("Joe", response.getName());
+        assertEquals("actor", response.getJob());
+
 
     }
 
     @Test
     void updateUserTest() {
-        String userData = "{\"name\": \"Joe\", \"job\": \"director\"}";
-        given()
+        ApiTestsUserModel ApiTestsModel = new ApiTestsUserModel();
+        ApiTestsModel.setName("Joe");
+        ApiTestsModel.setJob("director");
+
+        ApiTestsUpdateResponseModel response = given()
 
                 .log().all()
                 .filter(withCustomTemplates())
                 .contentType(ContentType.JSON)
-                .body(userData)
+                .body(ApiTestsModel)
                 .when()
                 .put("/users/2")
                 .then()
                 .assertThat().statusCode(200)
-                .body("name", is("Joe"));
+
+                .extract().as(ApiTestsUpdateResponseModel.class);
+        assertEquals("Joe", response.getName());
+        assertEquals("director", response.getJob());
+
 
     }
 
