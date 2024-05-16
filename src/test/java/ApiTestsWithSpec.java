@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static Specs.ApiTestsSpec.*;
+import static specs.ApiTestsSpec.*;
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.empty;
