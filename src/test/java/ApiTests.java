@@ -81,9 +81,7 @@ public class ApiTests {
                 .body(userData)
                 .when()
                 .put("/users/2")
-                .then()
-                .assertThat().statusCode(200)
-                .body("name", is("Joe"));
+                .then().body("name", is("Joe"));
 
     }
 

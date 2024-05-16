@@ -22,11 +22,13 @@ public class ApiTestsWithSpec {
     @Test
     @DisplayName("Пользователь не найден")
     void userNotFoundTest() {
-        step("Send request", () -> given(userNotFoundRequest)
+        int desiredStatusCode = 404;
+        step("Send request", () -> given(standartRequestSpec)
                 .when()
                 .get("/api/users/23")
                 .then()
-                .assertThat().statusCode(404));
+                .spec(standartResponseSpec(desiredStatusCode)));
+
     }
 
 
@@ -36,13 +38,14 @@ public class ApiTestsWithSpec {
         ApiTestsRegisterModel ApiTestRegisterModel = new ApiTestsRegisterModel();
         ApiTestRegisterModel.setEmail("eve.holt@reqres.in");
         ApiTestRegisterModel.setPassword("pistol");
+        int desiredStatusCode = 200;
 
-        ApiTestsRegisterResponseModel response = step("Send request", () -> given(registerUserSuccessRequest)
+        ApiTestsRegisterResponseModel response = step("Send request", () -> given(standartRequestSpec)
                 .body(ApiTestRegisterModel)
                 .when()
                 .post("/register")
                 .then()
-                .spec(registerUserSuccessResponse)
+                .spec(standartResponseSpec(desiredStatusCode))
                 .extract().as(ApiTestsRegisterResponseModel.class));
         step("Check response", () -> {
             assertEquals("4", response.getId());
@@ -55,11 +58,13 @@ public class ApiTestsWithSpec {
     @Test
     @DisplayName("Наличие фото")
     void checkAvatar() {
+        int desiredStatusCode = 200;
         step("Send request", () ->
-                given(checkAvatarRequest)
+                given(standartRequestSpec)
                         .when()
                         .get("/users?page=2")
                         .then()
+                        .spec(standartResponseSpec(desiredStatusCode))
                         .body("data.avatar", not(empty())));
     }
 
@@ -70,12 +75,13 @@ public class ApiTestsWithSpec {
         ApiTestsUserModel ApiTestsModel = new ApiTestsUserModel();
         ApiTestsModel.setName("Joe");
         ApiTestsModel.setJob("actor");
-        ApiTestsCreateResponseModel response = step("Send request", () -> given(createUserTestRequest)
+        int desiredStatusCode = 201;
+        ApiTestsCreateResponseModel response = step("Send request", () -> given(standartRequestSpec)
                 .body(ApiTestsModel)
                 .when()
                 .post("/users")
                 .then()
-                .spec(createUserTestResponse)
+                .spec(standartResponseSpec(desiredStatusCode))
                 .extract().as(ApiTestsCreateResponseModel.class));
         step("Check response", () -> {
             assertEquals("Joe", response.getName());
@@ -90,14 +96,16 @@ public class ApiTestsWithSpec {
         ApiTestsUserModel ApiTestsModel = new ApiTestsUserModel();
         ApiTestsModel.setName("Joe");
         ApiTestsModel.setJob("director");
+        int desiredStatusCode = 200;
 
-        ApiTestsUpdateResponseModel response = step("Send request", () -> given(updateUserTestRequest)
+
+        ApiTestsUpdateResponseModel response = step("Send request", () -> given(standartRequestSpec)
 
                 .body(ApiTestsModel)
                 .when()
                 .put("/users/2")
                 .then()
-                .spec(updateUserTestResponse)
+                .spec(standartResponseSpec(desiredStatusCode))
                 .extract().as(ApiTestsUpdateResponseModel.class));
         step("Check response", () -> {
             assertEquals("Joe", response.getName());
@@ -105,7 +113,5 @@ public class ApiTestsWithSpec {
         });
 
     }
-
-
 }
 
